@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1556476761435.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "701884741",
+    "id" : "2970062B",
+    "lastKnownWriteTime" : 1556477237,
+    "last_content_update" : 1556477237514,
+    "path" : "~/desarrollo/streams/acdr/vignettes/acdr.tex",
+    "project_path" : "vignettes/acdr.tex",
+    "properties" : {
+        "cursorPosition" : "118,0",
+        "scrollLine" : "109"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "tex"
+}

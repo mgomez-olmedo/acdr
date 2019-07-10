@@ -1,0 +1,108 @@
+#' Function that estimates probabilities from a string x
+#' It contains a window of active values. It has a parameter n
+#' for making the test: it compares the n last values with the n first
+#' values of the windows (it must have a size greater or equal to 2*n)
+#' if there are significant differences it removes the first n values
+#' of the window and repeats the test.
+#' alpha is the threshold for the odds
+#' @param x of data
+#' @param n window size
+#' @param alpha threshold for computing odds
+#' @return list with the estimations, list of the sample sizes,
+#' and list of forgotten samples and values for ro
+estimate1 <- function(x, n, alpha) {
+  # initialization
+  y <- rep(0, length(x))
+  s   <- rep(0, length(x))
+  ro <-  rep(0, length(x))
+  l <- 0
+  k <- 1
+
+  # deal each sample of the stream
+  for (i in 1:length(x)) {
+    if (i - k >= 2 * n - 1) {
+      test <- 1
+      l <- 0
+
+      while (test == 1) {
+        j1 = k + n - 1
+        j2 = i - n + 1
+
+        x1 = sum(x[k:j1])
+        x2 = sum(x[j2:i])
+
+        # compute odds
+        odd <- computeoddsc(n, n, x1, x2, 4)
+
+        if (odd < alpha) {
+          k <- k + n
+          l <- l + n
+          if (i - k < 2 * n - 1) {
+            test <- 0
+          }
+        }
+        else {
+          test <- 0
+        }
+      }
+    }
+
+    y[i] <- (sum(x[k:i]) + 1) / (i - k + 1 + 2)
+    s[i] <-  i - k + 1
+    ro[i] <- l
+  }
+
+  # return result
+  return(list(
+    data = x,
+    estimate = y,
+    s = s,
+    ro = ro
+  ))
+}
+
+#' Function that calls to estimate1 for a set of parameters
+#' @param x stream of data
+#' @param param parameters for the experiment
+#' @param real value of p parameter for each sample
+#' @param iteration number of iteration
+#' @return list with results of execution
+sexp1 <- function(x, param, rp, iteration) {
+  # extract params from param argument
+  n1 <- as.integer(param[2])
+  n2 <- as.integer(param[3])
+  alpha <- as.numeric(param[4])
+
+  # prepare the cluster
+  nCores <- parallel::detectCores()-2
+  cat("number of cores: ", nCores, "\n")
+
+  cl <- parallel::makeCluster(nCores)
+  parallel::clusterExport(cl, ls.str(.GlobalEnv))
+
+  # performs the experiments for each value between n1 and n2
+  h <- parallel::parSapply(cl, n1:n2, function(y) {
+    elapsedTime <- microbenchmark::microbenchmark(z <- estimate1(x, y, alpha), times=1)
+    # plot(z$estimate, type = "l")
+
+    # compute kl distance between estimation and real value of p
+    l <- kl(z$estimate, rp)
+
+    # saves the results in a file
+    saveResult(method=1, iteration=iteration, args=c(n=y, alpha=alpha),
+               results=z, time=elapsedTime$time, realp=rp, kl=l)
+    return(l)
+  })
+
+  cat("Cluster stopped\n")
+  # stop cluster
+  parallel::stopCluster(cl)
+
+  # generates the result: id if experiment and parameters
+  # employed
+  met <- rep(1, n2 - n1 + 1)
+  arg1 <- n1:n2
+  arg2 <- rep(alpha, n2 - n1 + 1)
+  return(list(h, met, arg1, arg2))
+}
+

@@ -1,0 +1,7 @@
+{
+    "installOptions" : {
+        "installDependencies" : true,
+        "installFromRepository" : true,
+        "libraryPath" : "/home/gte/mgomez/R/x86_64-redhat-linux-gnu-library/3.6"
+    }
+}

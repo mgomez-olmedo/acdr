@@ -1,0 +1,102 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{paralist}
+\usepackage{verbatim}
+\usepackage{subfig} 
+\usepackage{fancyhdr}
+\pagestyle{fancy} 
+\usepackage{sectsty}
+\usepackage[nottoc,notlof,notlot]{tocbibind}
+\usepackage[titles,subfigure]{tocloft}
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape}
+
+\title{Results for method  3 }
+
+\begin{document}
+\maketitle
+\section{Relevant information}
+
+\subsection*{Algorithm with min. KL} 
+3-ro-0.97 
+
+ \medskip
+\begin{itemize}
+\item KL avg.:  0.0123179 
+\item KL desv.:  0.00448761 
+\item Time avg.:  0.00183137 
+\item Time desv.:  0.000763639 
+\end{itemize}
+
+\subsection*{Algorithm with max. KL} 
+3-ro-1 
+
+ \medskip
+\begin{itemize}
+\item KL avg.:  0.139749 
+\item KL desv.:  0.0917615 
+\item Time avg.:  0.00135533 
+\item Time desv.:  0.000407556 
+\end{itemize}
+
+\subsection*{Algorithm with min. computation time} 
+3-ro-1 
+
+ \medskip
+\begin{itemize}
+\item KL avg.:  0.139749 
+\item KL desv.:  0.0917615 
+\item Time avg.:  0.00135533 
+\item Time desv.:  0.000407556 
+\end{itemize}
+
+\subsection*{Algorithm with max. computation time} 
+3-ro-0.8 
+
+ \medskip
+\begin{itemize}
+\item KL avg.:  0.044151 
+\item KL desv.:  0.0117891 
+\item Time avg.:  0.031684 
+\item Time desv.:  0.00827602 
+\end{itemize}
+
+
+\section{Tables with results}
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|}\hline
+method id & kl. av. & kl. std. & time av. & time std. \\\hline
+3-ro-0.97 & 0.0123179   & 0.00448761   & 0.00183137   & 0.000763639  \\\hline
+3-ro-0.98 & 0.0124069   & 0.00620734   & 0.00179376   & 0.000563994  \\\hline
+3-ro-0.96 & 0.0134884   & 0.00392431   & 0.00186795   & 0.000575573  \\\hline
+3-ro-0.95 & 0.0151397   & 0.00386405   & 0.00188593   & 0.000555407  \\\hline
+3-ro-0.94 & 0.0170091   & 0.00406342   & 0.00186631   & 0.000718342  \\\hline
+3-ro-0.99 & 0.0176068   & 0.0121894   & 0.00193993   & 0.000584743  \\\hline
+3-ro-0.93 & 0.0189838   & 0.0044084   & 0.00176999   & 0.00058146  \\\hline
+3-ro-0.92 & 0.021007   & 0.00484073   & 0.00175643   & 0.000570434  \\\hline
+3-ro-0.91 & 0.0230477   & 0.00532886   & 0.0311293   & 0.00812206  \\\hline
+3-ro-0.9 & 0.0250875   & 0.00585454   & 0.00190863   & 0.000720318  \\\hline
+3-ro-0.89 & 0.027115   & 0.00640646   & 0.00180229   & 0.000562116  \\\hline
+3-ro-0.88 & 0.0291228   & 0.00697713   & 0.00190643   & 0.000581201  \\\hline
+3-ro-0.87 & 0.0311063   & 0.00756128   & 0.00181244   & 0.0005596  \\\hline
+3-ro-0.86 & 0.0330622   & 0.00815502   & 0.00184633   & 0.0005915  \\\hline
+3-ro-0.85 & 0.0349887   & 0.00875539   & 0.00189263   & 0.000544782  \\\hline
+3-ro-0.84 & 0.0368844   & 0.00936006   & 0.00196721   & 0.000565191  \\\hline
+3-ro-0.83 & 0.0387487   & 0.00996716   & 0.00190707   & 0.000620412  \\\hline
+3-ro-0.82 & 0.0405812   & 0.0105752   & 0.00180271   & 0.000598832  \\\hline
+3-ro-0.81 & 0.0423819   & 0.0111828   & 0.00187144   & 0.000599067  \\\hline
+3-ro-0.8 & 0.044151   & 0.0117891   & 0.031684   & 0.00827602  \\\hline
+3-ro-0.999 & 0.0921484   & 0.0652057   & 0.00194423   & 0.000533606  \\\hline
+3-ro-0.9999 & 0.133742   & 0.0879368   & 0.00152177   & 0.000514662  \\\hline
+3-ro-1 & 0.139749   & 0.0917615   & 0.00135533   & 0.000407556  \\\hline
+\end{tabular}
+\end{table}
+
+
+\end{document}

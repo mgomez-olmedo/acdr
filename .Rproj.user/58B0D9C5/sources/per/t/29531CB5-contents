@@ -1,0 +1,14 @@
+context("Tests on utils.Rt")
+
+test_that("computeoddsc function", {
+  n1 <- 4
+  n2 <- 4
+  x1 <- c(1,0,1,0)
+  x2 <- c(0,0,0,0)
+  odds <- computeoddsc(n1, n2, x1, x2, 2)
+
+  expect_true(odds[1] == 1.300317)
+  expect_true(odds[2] == 1.486077)
+  expect_true(odds[3] == 1.300317)
+  expect_true(odds[4] == 1.486077)
+})

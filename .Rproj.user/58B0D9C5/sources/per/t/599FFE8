@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1556475797457.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "180606331",
+    "id" : "599FFE8",
+    "lastKnownWriteTime" : 1556475861,
+    "last_content_update" : 1556475861147,
+    "path" : "~/desarrollo/streams/acdr/R/estimate36-BFV2.R",
+    "project_path" : "R/estimate36-BFV2.R",
+    "properties" : {
+        "cursorPosition" : "96,12",
+        "scrollLine" : "83"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,188 @@
+
+#' This function computes the odds P(nochange)/P(change) in two binomial
+#' sequences
+#' @param n1 sample size of first sequence
+#' @param n2 sample size of the second sequences
+#' @param x1 is the counting of 1s in first sequences
+#' @param x2 number of 1s in the second sequence
+#' @param s the problem is solved with a Bayesian BDEu score with
+#' equivalent sample size s
+#' @return odd (vector value with odds)
+computeoddsc <- function(n1, n2, x1, x2, s) {
+  lgs4 <- lgamma(s / 4)
+  lgs2 <- lgamma(s / 2)
+
+  # compute change
+  change <- (
+    lgamma(s / 2) - lgamma(n1 + s / 2)     +
+      lgamma(x1 + s / 4) -  lgs4  +
+      lgamma((n1 - x1) + s / 4) -  lgs4 +
+      lgamma(s / 2) - lgamma(n2 + s / 2)     +
+      lgamma(x2 + s / 4) -  lgs4  +
+      lgamma((n2 - x2) + s / 4) -  lgs4
+  )
+
+  # compuet nochenge
+  nochange <-  (
+    lgamma(s) - lgamma(n1 + n2 + s) +
+      lgamma(x1 + x2 + s / 2)  - lgs2 +
+      lgamma(n1 + n2 - x1 - x2 + s / 2) - lgs2
+  )
+
+  # computes difference between nochange and change
+  relative <- nochange - change
+
+  # compute odd
+  odd <- exp(relative)
+
+  # return odd value
+  return(odd)
+}
+
+#' compute p value for a test over four sequences (two serving as
+#' references and two to check against)
+#' @param x1 number of 1s in reference serie
+#' @param x2 number of 0s in reference serie
+#' @param x1n number of 1s in second serie
+#' @param x2n number of 0s in second serie
+#' @return p value of statistic
+computepvalue <- function(x1, x2, x1n, x2n) {
+  # compute total number of values
+  total <- x1 + x2 + x1n + x2n
+
+  # compute statistics
+  e11 <- (x1 + x1n) * (x1 + x2) / total
+  e12 <-  (x2 + x2n) * (x1 + x2) / total
+  e21 <-  (x1 + x1n) * (x1n + x2n) / total
+  e22 <-  (x2 + x2n) * (x1n + x2n) / total
+
+  # compute the array before making the test
+  tab <- array(c(x1, x1n, x2, x2n), dim = c(2, 2))
+
+  # perform the test
+  if ((e11 >= 5) && (e12 >= 5) && (e21 >= 5) && (e22 >= 5)) {
+    p <-   stats::chisq.test(tab)$p.value
+  }
+  else
+  {
+    p <- stats::fisher.test(tab)$p.value
+  }
+
+  return(p)
+}
+
+#' Simulate a series of binomial values
+#' @param n the size of the sample for each probability value (the same for all)
+#' @param t a vector of the different probability values
+simulate <- function(n, t) {
+  # initialize the final vector
+  x <- c()
+
+  for (r in t) {
+    x1 <- rbinom(n, 1, r)
+    x <- append(x, x1)
+
+  }
+  return(x)
+}
+
+#' Function test with initial simulated data and probability estimations
+#' It computes the average log likelihood of the observations with the
+#' estimations of the previous step
+#' @param x stream data to analyze
+#' @param y estimation of the data
+#' @return average loglikelihood
+test <- function(x, y) {
+  l <- 0
+  n <- length(x)
+  for (i in 2:n) {
+    if (x[i] == 1)
+    {
+      l <- l + log(y[i - 1])
+    }
+    else {
+      l <- l + log(1 - y[i - 1])
+    }
+  }
+
+  return(l / (n - 1))
+}
+
+#' Function that estimates probabilities according the
+#' Bifet, Gavalda, 2007 procedure
+#' @param n1 number of 1s in the first sequence
+#' @param n2 number of 1s in the second sequence
+#' @param l1 length of the first sequence
+#' @param l2 length of the second sequence
+#' @param delta parameter for test computation
+#' @return boolean flag
+testel <- function(n1, n2, l1, l2, delta) {
+  sig <- FALSE
+  m <- 1 / (1 / l1 + 1 / l2)
+
+  cut <- sqrt(1 / (2 * m) * ((n1 + n2) / (i - k + 1)) *
+                ((i - k + 1 - n1 - n2) / (i - k + 1)) *
+                log(2 / delta)) + 2 / (3 * m) *
+    log(2 / delta)
+
+  # compute sig value
+  if (abs(n1 / l1 - n2 / l2) > cut)
+    sig <- TRUE
+
+  return(sig)
+}
+
+#' Computes Kullback-Leibler distance
+#' @param y1 a vector with the estimated probabilities
+#' @param y2 a vector with the true probabilities
+#' @param z a vector of observations
+#' @return KL computation
+kld <- function(y1, y2, z) {
+  l <- 0
+  n <- length(z)
+  res <- vector(mode = "numeric", n)
+  for (i in 1:n) {
+    res[i] <- z[i] * log(y2[i] / y1[i]) + (1 - z[i]) * log((1 - y2[i]) / (1 - y1[i]))
+  }
+
+  # return res value
+  return(res)
+}
+
+#' Computes KLs distance
+#' @param z1 the true probability of 1
+#' @param z2 the estimated probability of 1
+#' @return res value
+kls <- function(z1, z2) {
+  # computes res
+  res <- z1 * log(z1 / z2) + (1 - z1) * log((1 - z1) / (1 - z2))
+
+  # return res value
+  return(res)
+}
+
+#' computes Kullbac-Leibler distance
+#' @param y the vector of estimated probabilities
+#' @param z the vector of true probabilities
+#' @return computed value
+kl <- function(y, z) {
+  l <- 0
+  n <- length(z)
+  for (i in 1:n) {
+    l <- l + z[i] * log(z[i] / y[i]) + (1 - z[i]) * log((1 - z[i]) / (1 - y[i]))
+  }
+
+  return(l / (n))
+}
+
+#' Computes log-likelihood
+#' TODO: is the same code as kls
+#' @param z1 the true probability of 1
+#' @param z2 the estimated probability of 1
+#' @return res value
+logl <- function(z1, z2) {
+  res <- z1 * log(z1 / z2) + (1 - z1) * log((1 - z1) / (1 - z2))
+  return(res)
+}
+
+

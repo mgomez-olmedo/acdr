@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1556058158266.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3771573065",
+    "id" : "F08EE231",
+    "lastKnownWriteTime" : 1556472007,
+    "last_content_update" : 1556472007643,
+    "path" : "~/desarrollo/streams/acdr/R/estimate1.R",
+    "project_path" : "R/estimate1.R",
+    "properties" : {
+        "cursorPosition" : "68,41",
+        "scrollLine" : "57"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

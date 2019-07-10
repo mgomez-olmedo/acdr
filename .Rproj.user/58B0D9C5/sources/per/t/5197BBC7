@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1555959415830.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4269536674",
+    "id" : "5197BBC7",
+    "lastKnownWriteTime" : 1556055790,
+    "last_content_update" : 1556055790,
+    "path" : "~/desarrollo/streams/acdr/R/utils.R",
+    "project_path" : "R/utils.R",
+    "properties" : {
+        "cursorPosition" : "11,12",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

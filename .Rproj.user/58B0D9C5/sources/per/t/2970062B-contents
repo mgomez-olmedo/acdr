@@ -1,0 +1,437 @@
+\documentclass{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+
+\usepackage[utf8]{inputenc}
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry}
+\geometry{a4paper}
+
+% Graphics and floating objects
+\usepackage{graphicx}
+\usepackage{float}
+
+% Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% Math mode
+\usepackage{amsmath}
+
+%%% PACKAGES for improving the document
+\usepackage{booktabs} % tables
+\usepackage{array} % arrays in maths
+\usepackage{verbatim}
+\usepackage{subfig} % captions in figs
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+%%% SECTION TITLE APPEARANCE
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\mdseries\upshape}
+
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\title{Abrupt concept drift detection}
+\author{Cano, A., Gomez-Olmedo, M., Moral, S.}
+\maketitle
+
+\section{Graph representation}
+
+Let $N$ be the number of variables in the database to learn from. The structure
+of the network will be represented with $G$, a $N \times N$ matrix. The
+values to be considered are those over the main diagonal ($i > j$) just because
+the matrix is symmetric. The possible values of $G$, $G_{ij}$ represent the
+relationship between the variables with indices $i$ and $j$ ($X_i$ and $X_j$):
+
+\begin{itemize}
+\item $+1$: there is a link going from $X_i$ to $X_j$ ($X_i \rightarrow X_j$)
+\item $-1$: the links goes from $X_j$ to $X_i$ ($X_i \leftarrow X_j$)
+\item $0$: both variables are indpendent, that is, there is no link between
+$X_i$ and $X_j$
+\end{itemize}
+
+```{r}
+# execute code if the date is later than a specified day
+do_it = Sys.Date()
+```{r, eval=do_it}
+
+\section{Probability distribution}
+
+The probability of the graph $G$ given the dataset $D$, $P(G|D)$ will be
+represented with another $N \times N$ matrix , $Q(G|\lambda)$. As in the
+case of the graph representation the values of interest are those above
+the main diagonal. Each $Q_{ij}$ represents the probability of the different
+situations for the link between $X_i$ and  $X_j$. Therefore, $Q_{ij}$
+represents a variable with three possible states  ($+1,0,-1$). There
+will be probability for each one:  $p(Q_{ij[+1]}) = p(X_i \rightarrow X_j)$,
+$p(Q_{ij[0]}) = p(X_i \perp X_j)$ and  $p(Q_{ij[-1]}) =p(X_i \leftarrow X_j)$.
+
+\section{Structural learning}
+
+The objective is to learn from the data the graph maximizing $P(G|D)$ with a
+\textbf{variational} approach. As $Q$ is the representation of the graph, the
+final objective will be to find the set of parameters $\lambda$ according to:
+
+\begin{equation}
+arg min_{\lambda} KL(Q(G|\lambda) | P(G|D))
+\end{equation}
+
+This optimization problem will be solved with Monte Carlo estimation of
+gradients and coordinate ascent. The general procedure can de defined
+as follows (Algorithm \ref{algorithm0}):
+
+\begin{algorithm}[H]
+\caption{Variational structure learning}
+\begin{algorithmic}[1]
+\Function{learn}{$D$}\Comment{Where $D$ - dataset to learn from}
+   \State initialize $Q(G|\lambda)$\Comment{Algorithm \ref{algorithm1}}
+   \While{stop condition}
+      \State updateQ($Q(G|\lambda)$)\Comment{Algorithm \ref{algorithm2}}
+      \State monitor process evaluation
+      \State evaluate stop condition
+   \EndWhile
+\EndFunction
+\end{algorithmic}
+\label{algorithm0}
+\end{algorithm}
+
+The \textbf{R} file containing the main method for this algorithm is
+\textbf{VSLearning.R}. This file includes the description of a \textbf{R6}
+class called \textbf{VSLearning}. The most relevant data members belonging
+to this class are described below:
+
+\begin{itemize}
+\item \textbf{maxIter}: maximum number of iterations for the previous
+algorithm. By now the algorithm is controlled with this parameter but
+new stop conditions could be included according to the evolution of
+the learning process.
+\item \textbf{nParentSets}: maimum number of parents configuration to
+sample for updating each $Q_{ij}$.
+\item \textbf{logQ}: matrix containg the scores for each link.
+\item \textbf{proQ}: matrix derived from $logQ$ via normalization in order
+to ge the probabilities for each link. These two data members are objects
+of another class used for managing matrices and termed \textbf{QMatrix}.
+\item \textbf{scorer}: data member of class \textbf{ScoreComputation}. This
+class offers functions for making the knid of scores required for this
+algorithm.
+\item different measures gathered during the evolution of the algorithm
+are stored in order to generate graphs and gaining insight about its
+performance.
+\end{itemize}
+
+The main method of this class is \textbf{learn} and offers the basic behaviour
+described in Algorithm \ref{algorithm0}.
+
+
+\begin{knitrout}\tiny
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+    \hlcom{#' main method for learning}
+    \hlstd{learn}\hlkwb{=}\hlkwa{function}\hlstd{()\{}
+        \hlcom{# random initialization of probQ matrix}
+        \hlstd{private}\hlopt{$}\hlstd{probQ}\hlopt{$}\hlkwd{randomInitialization}\hlstd{()}
+
+        \hlcom{# main loop until stop condicion}
+        \hlstd{iterations} \hlkwb{<-} \hlnum{1}
+
+        \hlkwa{while}\hlstd{(iterations} \hlopt{<=} \hlstd{private}\hlopt{$}\hlstd{maxIter)\{}
+          \hlcom{# update Q values}
+          \hlstd{private}\hlopt{$}\hlkwd{updateQ}\hlstd{()}
+
+          \hlcom{# computes the lower bound}
+          \hlstd{bound} \hlkwb{<-} \hlstd{private}\hlopt{$}\hlkwd{computeLowerBound}\hlstd{()}
+
+          \hlcom{# stores info for analyzing the evolution of the system}
+          \hlstd{private}\hlopt{$}\hlkwd{storeEvolutionInfo}\hlstd{(bound, iterations)}
+
+          \hlcom{# increment the number of iterations}
+          \hlstd{iterations} \hlkwb{<-} \hlstd{iterations}\hlopt{+}\hlnum{1}
+        \hlstd{\}}
+
+        \hlcom{# generate graphs}
+        \hlstd{private}\hlopt{$}\hlkwd{generateGraphics}\hlstd{()}
+    \hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+\section{Initialization}
+
+The matrix representing $Q(G|D)$ will be randomly initialized with the
+procedure described in Algorithm \ref{algorithm1}.
+
+\begin{algorithm}[H]
+\caption{$Q(G|D)$ matrix initialization}
+\begin{algorithmic}[1]
+\Function{initialize}{$Q(G|\lambda)$}\Comment{Where $Q$ - $N \times N$ matrix}
+   \For{$i = 0$ to ${N}$}
+        \For{$j = i+1$ to ${N}$}
+            \State generate random value $U(0,1)$ for $G_{ij[+1]}$
+            \State generate random value $U(0,1)$ for $G_{ij[0]}$
+            \State generate random value $U(0,1)$ for $G_{ij[-1]}$
+            \State normalize probability values
+        \EndFor
+   \EndFor
+\EndFunction
+\end{algorithmic}
+\label{algorithm1}
+\end{algorithm}
+
+\section{Optimization}
+
+
+The procedure of updating the values $Q_{ij}$ is described in Algorithm \ref{algorithm2}.
+
+\begin{algorithm}[H]
+\caption{$Q(G|\lambda)$ matrix updating}
+\begin{algorithmic}[1]
+\Function{updateQ}{$Q(G|\lambda)$}\Comment{Where $Q$ - $N \times N$ matrix; $m$ number of samples}
+   \For{$i = 0$ to ${N}$}
+        \For{$j = i+1$ to ${N}$}
+            \State // generate parents set for updading $Q_{ij}$: $pa(X_i), pa(X_j)$
+            \State $dfpa_{X_i}$=generateParentsSets$(i, m, Q(G|\lambda))$
+            \State $dfpa_{X_j}$=generateParentsSets$(j, m, Q(G|\lambda))$
+            \State // update probability values
+            \State updateQDistribution$(dfpa_{X_i}, dfpa_{X_j}, i, j, m, Q(G|\lambda))$
+        \EndFor
+   \EndFor
+\EndFunction
+\end{algorithmic}
+\label{algorithm2}
+\end{algorithm}
+
+The updating of $Q_{ij}$ requires sampling sets of parents for
+$X_i$ and $X_j$ and computing scores for each possible situation:
+$X_i \rightarrow X_j$, $X_i \leftarrow X_j$ and $X_i \perp X_j$. The procedure for sampling parents
+is described in Algorithm \ref{algorithm3}. When sampling parents for $X_i$ it is
+needed to consider the distributions $Q_{ij}$ for each pair $(X_i, X_j), j > i$ and
+$(X_j, X_i), j < i$. The distributions for $Q_{ij}, j > i$ will produce $j$ as
+parent if the random number generated leads to the state $Q_{ij[-1]}$ (in this
+case the link will be $X_i \leftarrow X_j$). The distributions for $Q_{ji}, j < i$
+will add $j$ as parent if the ramdom number produces the selection of the
+state $Q_{ij[+1]}$ (the link goes from $X_j$ to $X_i$: $X_j \rightarrow X_i$).
+
+\medskip
+
+\begin{algorithm}[H]
+\caption{generating parent sets for $X_i$}
+\begin{algorithmic}[1]
+\Function{generateParentsSets}{$i, m, Q(G|\lambda)$}
+   \State create a data frame ($dfpa_{X_i}$) with $m$ rows and $N$ columns
+($X_1, \ldots X_n$)
+   \State sets $pa = 0$
+   \For{$s = 1$ to $m$}
+      \For{$j = i+1$ to $N$}
+         \State generate a random number $r=U(0,1)$
+         \State selects $X_j$ as parent if $r$ corresponds to
+              $Q_{ij[-1]}$, $dfpa_{X_i}(s,j)=1$
+      \EndFor
+      \For{$j=1$ to ${i-1}$}
+         \State generate a random number $r=U(0,1)$
+         \State selects $X_j$ as parent if $r$ corresponds to
+              $Q_{ji[+1]}$, $dfpa_{X_i}(s,j)=1$
+      \EndFor
+   \EndFor
+   \State \Return $dfpa_{X_i}$
+\EndFunction
+\end{algorithmic}
+\label{algorithm3}
+\end{algorithm}
+
+The data frames $dfpa_{X_i}$ and $dfpa_{X_j}$ are used for updating $Q_{ij}$.
+This step is described in Algorithm \ref{algorithm4}. When this procedure
+finishes there are new estimations for the probabilities describing the
+states for the link between $X_i$ and $X_j$. The auxiliar method called
+updateProb is introduced for convenience (see Algorithm \ref{algorithm5}).
+
+
+\begin{algorithm}[H]
+\caption{$Q_{ij}$ distribution updating}
+\begin{algorithmic}[1]
+\Function{updateQDistribution}{$dfpa_{X_i}, dfpa_{X_j}, i, j, m, Q(G|\lambda)$}
+   \State // complete sets of parents for computing scores
+   \State $s_{i1}$ = $dfpa_{X_i}(X_j=1)$
+   \State $s_{i0}$ = $dfpa_{X_i}(X_j=0)$
+   \State $s_{j0}$ = $dfpa_{X_j}(X_i=0)$
+   \State $s_{j1}$ = $dfpa_{X_j}(X_i=1)$
+   \State
+   \State // update prob. value for $Q_{ij[-1]}$
+   \State $Q_{ij[-1]}=updateProb(m, s_{i1}, s_{j0})$
+   \State
+   \State // update prob. value for $Q_{ij[+1]}$
+   \State $Q_{ij[+1]}=updateProb(m, s_{i0}, s_{j1})$
+   \State
+   \State // update prob. value for $Q_{ij[0]}$
+   \State $Q_{ij[0]}=updateProb(m, s_{i0}, s_{j0})$
+\EndFunction
+\end{algorithmic}
+\label{algorithm4}
+\end{algorithm}
+
+
+The update of each probability value is explained in Algorithm \ref{algorithm5} and
+requires the computation of scores.
+
+\begin{algorithm}[H]
+\caption{$Q_{ij[s]}$ updating}
+\begin{algorithmic}[1]
+\Function{updateProb}{m, $s_i$, $s_j$}\Comment{$s_i$, $s_j$: parent sets of $X_i$ and $X_j$}
+   \State sum=0
+   \For{k = $1$ to $m$}
+       \State sets $pa_{X_i} = X_l$, where $s_i(k,l)=1$
+       \State sum=sum+$score(X_i,pa(X_i))$
+   \EndFor
+   \For{k = $1$ to $m$}
+       \State sets $pa_{X_j} = X_l$, where $s_j(k,l)=1$
+       \State sum=sum+$score(X_j,pa(X_j))$
+   \EndFor
+   \State \Return{$sum/n$}
+\EndFunction
+\end{algorithmic}
+\label{algorithm5}
+\end{algorithm}
+
+The last operation to perform is the computation of the score of a variable,
+$X_i$, given a certain parents set $pa(X_i)$. This operation is described in
+Algorithm \ref{algorithm6}.
+
+\begin{algorithm}[H]
+\caption{score computation}
+\begin{algorithmic}[1]
+\Function{score}{$X_i$, $pa(X_i)$}
+   \State $q_i=\prod_{x_j \in pa(X_i)} r_j$,  ($r_j$: number of states of $X_j$)
+   \State $n_{ik}=0$, for all states $k$ of $X_i$
+	\State $s=1$, (equivalent sample size)
+
+   \For{j=1 to $q_i=$} \Comment{gets statistics from the data set}
+       \State $n_{ij}=0$
+       \For{k=1 to $r_i$ (number of states of $X_i$)}
+          \State $n_{ijk}$: number of instances with $X_i=k$, $pa(X_i)=q_j$
+          \State $n_{ij}=n_{ij}+n_{ijk}$
+       \EndFor
+   \EndFor
+
+   \State sum=0 \Comment{computes score}
+   \For{j=1 to $q_i=$}
+       \State val1= $log \left( \dfrac{\Gamma(s/q_i)}{\Gamma(n_{ij}+s/q_i)} \right)$
+       \State val2=0
+       \For{k=1 to $r_i$}
+          \State val2=val2+$log\left(\dfrac{\Gamma(n_{ijk}+s/r_iq_i)}{\Gamma(s/r_iq_i)}\right)$
+       \EndFor
+       \State sum=sum+val1+val2
+   \EndFor
+   \State penalty=$ln(\binom{N}{|\Pi_i|})$\Comment{$|\Pi_i|$: number of $X_i$ parents}
+   \State \Return $sum-penalty$
+\EndFunction
+\end{algorithmic}
+\label{algorithm6}
+\end{algorithm}
+
+\section{Evolution of the algorithm}
+
+The evolution of the algorithm can be analyzed computing the lower bound of the joint
+probability represented by $Q$:
+
+\begin{equation}
+\mathcal{L}(Q) = \sum_{i=1}^{N} \dfrac{1}{N} \sum_{\Pi_k \sim Q(pa(X_i))} score(X_i| \Pi_k)
+\end{equation}
+
+The procedure for getting this bound is described in
+Algorithm \ref{algorithm7}.
+
+\begin{algorithm}[H]
+\caption{compute lower bound}
+\begin{algorithmic}[1]
+\Function{computeLowerBound}{$Q(G|\lambda)$}
+   \State globalSum=0
+   \For{i = $1$ to $N$}
+       \State $dfpa_{X_i} = generateParentSets(i,m,Q(G|\lambda)$
+       \State sum=0
+       \For{k = $1$ to $m$}
+          \State $pa(X_i)=dfpa_{X_i}(k,X_j=1)$ \Comment{selects $X_j$ in row $k$ with $dfpa_{X_i}(i,j)=1$}
+          \State sum=sum+$score(X_i,pa(X_i))$
+       \EndFor
+       \State globalSum=globalSum+(sum/m)
+   \EndFor
+   \State \Return{$globalSum$}
+\EndFunction
+\end{algorithmic}
+\label{algorithm7}
+\end{algorithm}
+
+
+\section{Design decisions}
+
+\begin{itemize}
+\item keep to copies of $Q_{ij}$: one with logs and another with probabilities
+\item condition stop: fixed number of iterations
+\item evolution: computation of the lower bound. I have introduced a new algorithm
+for this computation
+\item evaluation of hash table for storing scores
+\end{itemize}
+
+
+\end{document}

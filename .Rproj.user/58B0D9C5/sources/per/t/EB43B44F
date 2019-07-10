@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1555965163593.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1042842729",
+    "id" : "EB43B44F",
+    "lastKnownWriteTime" : 1555965160,
+    "last_content_update" : 1555965160,
+    "path" : "~/desarrollo/streams/acdr/NAMESPACE",
+    "project_path" : "NAMESPACE",
+    "properties" : {
+        "cursorPosition" : "1,0",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_namespace"
+}

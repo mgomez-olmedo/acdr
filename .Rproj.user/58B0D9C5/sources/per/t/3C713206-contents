@@ -1,0 +1,26 @@
+Package: acdr
+Type: Package
+Title: abrupt concept drift experiments
+Version: 0.1.0
+Authors@R: as.person(c(
+    "Serafin Moral <smc@decsai.ugr.es> [aut]", 
+    "Andres Cano <acu@decsai.ugr.es> [aut]",
+    "Manuel Gomez-Olmedo <mgomez@decsai.ugr.es.es> [aut, cre]"
+  ))
+Maintainer: Manuel Gomez-Olmedo <mgomez@decsai.ugr.es>
+Description: This R package contains all the elements required for testing some new 
+             methods focused on detecting abrupt concept drift in a distribution. This software
+             is used in the paper title "A Bayesian Approach to Abrupt Concept Drift".
+License: GPL-2 
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
+Suggests: 
+    testthat,
+    knitr,
+    rmarkdown
+Imports: 
+    stats,
+    parallel,
+    microbenchmark
+VignetteBuilder: knitr

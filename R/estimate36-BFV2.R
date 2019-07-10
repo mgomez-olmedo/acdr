@@ -1,0 +1,103 @@
+#' Estimation method named BFV2
+#' @param x stream to analyze
+#' @param n size of active window
+#' @param alpha1 value for test
+#' @param alpha2 value for test
+#' @param k parameter value
+#' @return list with data, estimations, values for s, fg and ro
+estimate36 <- function(x, n, alpha1, alpha2, k) {
+  y <- rep(1, length(x))
+  s   <- rep(1, length(x))
+  ro <- rep(1, length(x))
+  fg <- rep(1, length(x))
+  r <- rep(1, length(x))
+
+  param <- seq(0.0, 1.0, length = n + 1)
+  prob <- rep(1 / ((n + 1) * (k + 1)), (n + 1) * (k + 1))
+  prom <- matrix(prob, nrow = k + 1)
+  discount <- seq(alpha1, alpha2, length = k + 1)
+  delta <- (alpha2 - alpha1) / (k * k)
+
+  for (i in 1:k) {
+    discount[i + 1] = discount[i] + (2 * i - 1) * delta
+  }
+
+  for (i in 1:length(x)) {
+    sumr <- rowSums(prom)
+    sumt <- sum(sumr)
+    probdis <- sumr / sumt
+    for (l in 0:k) {
+      for (j in 0:n) {
+        prom[l + 1, j + 1] <-
+          (prom[l + 1, j + 1] * (1 - discount[l + 1]) + discount[l + 1] * (1 / (n +
+                                                                                  1)) * sumr[l + 1]) / sumt
+      }
+    }
+
+    {
+      if (x[i] == 1) {
+        for (l in 0:k) {
+          prom[l + 1, ] <- prom[l + 1, ] * param
+        }
+      }
+      else {
+        for (l in 0:k) {
+          prom[l + 1, ] <- prom[l + 1, ] * (1 - param)
+        }
+      }
+    }
+    probparam <-  colSums(prom)
+    probparam <- probparam / sum(probparam)
+    y[i] <- sum(probparam * param)
+    s[i] <- sum(probdis * discount)
+  }
+
+  return(list(
+    data = x,
+    estimate = y,
+    s = s,
+    fg = fg,
+    ro = ro
+  ))
+}
+
+#' Function that calls to estimate36 for a set of parameters
+#' @param x stream of data
+#' @param param parameters for the experiment
+#' @param rp real value of p parameter for each sample
+#' @param iteration number of iteration
+#' @return list with results of execution
+sexp36 <- function(x, param, rp, iteration) {
+  n1 <- as.integer(param[2])
+  n2 <- as.integer(param[3])
+  alpha1 <- as.numeric(param[4])
+  alpha2 <- as.numeric(param[5])
+  k <- as.numeric(param[6])
+
+  # prepare the cluster
+  nCores <- parallel::detectCores()-2
+  cl <- parallel::makeCluster(nCores)
+  parallel::clusterExport(cl, utils::ls.str(.GlobalEnv))
+
+  h <- parallel::parSapply(cl, n1:n2, function(y) {
+    elapsedTime <- microbenchmark::microbenchmark(z <- estimate36(x, y,
+                                                                  alpha1, alpha2, k), times=1)
+    # plot(z[[1]], type = "l")
+    l <- kl(z$estimate, rp)
+
+    # saves the results in a file
+    saveResult(method=36, iteration=iteration, args=c(n=y, alpha1=alpha1,
+                                                      alpha2=alpha2, k=k),
+               results=z, time=elapsedTime$time, realp=rp, kl=l)
+
+    return(l)
+  })
+
+  # stop cluster
+  parallel::stopCluster(cl)
+
+  met <- rep(36, n2 - n1 + 1)
+  arg <- n1:n2
+
+  return(list(h, met, arg))
+}
