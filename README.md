@@ -1,4 +1,4 @@
 # acdr
 Bayesian approach to abrupt concept drift detection
 
-The software contains all the software required for preproducing the experiments in the paper.
+The software contains all the functions required for reproducing the experiments in the paper.
